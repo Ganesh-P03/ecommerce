@@ -13,16 +13,39 @@ import {
   Container,
 } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
+import axios from "axios";
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("buyer");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     // handle signup logic here
+
+    const userData = {
+      name: firstName,
+      email: email,
+      password: password,
+      mobile: mobile,
+      role: role,
+    };
+    try {
+      const response = await axios.post("/api/signup", userData);
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong!");
+      }
+      console.log(data); // do something with the response
+      console.log("Signup successful");
+    } catch (error) {
+      console.log(error.message);
+      console.log("Signup failed");
+    }
   };
 
   return (
@@ -61,12 +84,12 @@ const Signup = () => {
               <TextField
                 required
                 fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="lname"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                id="mobile"
+                label="Mobile Number"
+                name="mobile"
+                autoComplete="mobile"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -94,6 +117,7 @@ const Signup = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Grid>
+
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox color="primary" />}
@@ -111,7 +135,7 @@ const Signup = () => {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link href="/login" variant="body2">
+              <Link href="/auth/login" variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>

@@ -12,7 +12,7 @@ const NavBar = () => {
           <Button
             color="inherit"
             onClick={() => {
-              window.location.href = "/login";
+              window.location.href = "/auth/login";
             }}
           >
             Login
