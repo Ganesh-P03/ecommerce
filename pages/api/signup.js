@@ -1,7 +1,7 @@
 import mysql from "mysql2/promise";
 import { hash } from "bcryptjs";
 
-export default async function handler(req, res) {
+export default async function signUphandler(req, res) {
   const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -12,35 +12,27 @@ export default async function handler(req, res) {
 
   try {
     const { name, email, password, mobile, role } = req.body;
-    const connection = pool.getConnection();
+    const connection = await pool.getConnection();
 
-    // const [rows] = await connection.query(
-    //   "SELECT * FROM users WHERE email = ?",
-    //   [email]
-    // );
+    const [rows] = await connection.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
 
-    // connection.release();
+    const hashedPassword = await hash(password, 10);
 
-    // if (rows.length > 0) {
-    //   res.status(400).json({ message: "User already exists" });
-    // } else {
-    //   const hashedPassword = await hash(password, 10);
+    const results = await connection.query(
+      `INSERT INTO users (name, email, password, mobile, role)
+            VALUES (?, ?, ?, ?, ?)
+            `,
+      [name, email, hashedPassword, mobile, role]
+    );
 
-    //   const connection = await pool.getConnection();
-
-    //   // const results = await connection.query(
-    //   //   `INSERT INTO users (name, email, password, mobile, role)
-    //   //       VALUES (?, ?, ?, ?, ?)
-    //   //       `,
-    //   //   [name, email, hashedPassword, mobile, role]
-    //   // );
-
-    //   connection.release();
+    connection.release();
 
     res.status(201).json({ message: "User created" });
-    //}
   } catch (error) {
     console.error(error);
-    res.status(500).send("An error occurred");
+    res.status(400).send("An error occurred");
   }
 }

@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
 import axios from "axios";
+import NextRouter from "next/router";
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
@@ -36,12 +37,8 @@ const Signup = () => {
     try {
       const response = await axios.post("/api/signup", userData);
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Something went wrong!");
-      }
-      console.log(data); // do something with the response
       console.log("Signup successful");
+      NextRouter.push("/auth/login");
     } catch (error) {
       console.log(error.message);
       console.log("Signup failed");

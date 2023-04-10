@@ -1,35 +1,44 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { hash } from "bcryptjs";
-import { pool } from "../../../config/mysql";
+import mysql from "mysql2/promise";
+
+const pool = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  connectionLimit: 10,
+});
 
 export default NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {},
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         try {
-          const connection = pool.getConnection();
-          console.log("here");
+          const connection = await pool.getConnection();
+          // const { username, password, usertype } = credentials;
 
-          const [rows] = await connection.query(
-            "SELECT * FROM users WHERE username = ? AND role = ?",
-            [credentials.username, credentials.role]
-          );
+          const [rows] = await connection.query("SELECT * FROM users ");
+
           connection.release();
+
+          //check if rows is empty
+
           if (rows.length > 0) {
             const user = rows[0];
-            let passwordMatch = false;
-            const hashedPassword = await hash(password, 10);
+            // let passwordMatch = false;
+            // const hashedPassword = await hash(password, 10);
 
-            if (credentials.password === hashedPassword) {
-              passwordMatch = true;
-            }
+            // if (hashedPassword === user.password) {
+            //   passwordMatch = true;
+            // }
 
-            if (!passwordMatch) {
-              return null;
-            }
+            // if (!passwordMatch) {
+            //   return null;
+            // }
 
             return user;
           } else {
@@ -46,5 +55,10 @@ export default NextAuth({
     signIn: "/auth/login",
   },
 
-  database: process.env.NEXTAUTH_DATABASE_URL,
+  callbacks: {
+    jwt(params) {
+      console.log(params);
+      return params;
+    },
+  },
 });
