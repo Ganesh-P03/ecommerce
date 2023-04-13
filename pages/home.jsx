@@ -9,9 +9,12 @@ import {
   CardContent,
 } from "@mui/material";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
+  const { status, data } = useSession();
+  console.log(status, data);
 
   useEffect(() => {
     async function fetchData() {
@@ -58,6 +61,8 @@ const HomePage = () => {
           </Grid>
         ))}
       </Grid>
+
+      <Typography variant="h4" align="center" gutterBottom></Typography>
     </Container>
   );
 };

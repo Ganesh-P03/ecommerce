@@ -25,7 +25,7 @@ export default async function signUphandler(req, res) {
       `INSERT INTO users (name, email, password, mobile, role)
             VALUES (?, ?, ?, ?, ?)
             `,
-      [name, email, hashedPassword, mobile, role]
+      [name, email, password, mobile, role]
     );
 
     connection.release();

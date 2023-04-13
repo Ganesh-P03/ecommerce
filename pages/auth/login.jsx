@@ -52,19 +52,12 @@ export default function Login() {
     event.preventDefault();
 
     const result = await signIn("credentials", {
-      redirect: false,
+      redirect: true,
       username: username,
       password: password,
       userType: userType,
+      callbackUrl: "/home",
     });
-
-    console.log(result);
-
-    // if (result.error) {
-    //   alert("Login failed. Please try again.");
-    // } else {
-    //   router.push("/home");
-    // }
   };
 
   return (
