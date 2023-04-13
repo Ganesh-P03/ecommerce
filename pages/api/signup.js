@@ -1,5 +1,6 @@
 import mysql from "mysql2/promise";
-import { hash } from "bcryptjs";
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 export default async function signUphandler(req, res) {
   const pool = mysql.createPool({
@@ -19,14 +20,14 @@ export default async function signUphandler(req, res) {
       [email]
     );
 
-    const hashedPassword = await hash(password, 10);
-
-    const results = await connection.query(
-      `INSERT INTO users (name, email, password, mobile, role)
-            VALUES (?, ?, ?, ?, ?)
-            `,
-      [name, email, password, mobile, role]
-    );
+    bcrypt.hash(password, saltRounds, async (err, hash) => {
+      await connection.query(
+        `INSERT INTO users (name, email, password, mobile, role)
+              VALUES (?, ?, ?, ?, ?)
+              `,
+        [name, email, hash, mobile, role]
+      );
+    });
 
     connection.release();
 

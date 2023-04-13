@@ -1,12 +1,28 @@
-import NavBar from "../components/navBar";
-import Footer from "../components/footer";
+import Layout from "@/components/layout";
+import { useSession } from "next-auth/react";
+import SellerDashboard from "@/components/seller";
+import { useState } from "react";
 
 export default function Index() {
-  return (
-    <div>
-      <NavBar />
-      <Footer />
-      <></>
-    </div>
-  );
+  const { status, data } = useSession();
+
+  const [user, setUser] = useState(null);
+
+  const displayContent = () => {
+    if (status == "uauthenticated") {
+    } else if (status == "authenticated") {
+      setUser(data.token);
+
+      role = data.token.role;
+
+      if (role == "seller") {
+        return seller();
+      } else if (role == "buyer") {
+      } else if (role == "advertiser") {
+      }
+    } else if (status == "loading") {
+    }
+  };
+
+  return <SellerDashboard />;
 }

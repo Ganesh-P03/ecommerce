@@ -11,6 +11,9 @@ import {
   Box,
   Typography,
   Container,
+  FormControl,
+  NativeSelect,
+  FormHelperText,
 } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
 import axios from "axios";
@@ -62,6 +65,22 @@ const Signup = () => {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
+
+        <FormControl fullWidth>
+          <NativeSelect
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            inputProps={{
+              name: "role",
+              id: "role-native-helper",
+            }}
+          >
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+            <option value="advertiser">Advertiser</option>
+          </NativeSelect>
+          <FormHelperText>Role</FormHelperText>
+        </FormControl>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -122,6 +141,7 @@ const Signup = () => {
               />
             </Grid>
           </Grid>
+
           <Button
             type="submit"
             fullWidth
@@ -144,3 +164,23 @@ const Signup = () => {
 };
 
 export default Signup;
+
+//mui dropdown to select role in signup
+/*
+<FormControl fullWidth>
+
+<NativeSelect
+  value={role}
+  onChange={(e) => setRole(e.target.value)}
+  inputProps={{
+    name: "role",
+    id: "role-native-helper",
+  }}
+>
+  <option value="buyer">Buyer</option>
+  <option value="seller">Seller</option>
+</NativeSelect>
+<FormHelperText>Role</FormHelperText>
+</FormControl>
+
+*/

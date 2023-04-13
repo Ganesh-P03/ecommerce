@@ -18,7 +18,6 @@ import { signIn } from "next-auth/react";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState("buyer");
   const [tabIndex, setTabIndex] = useState(0);
   const router = useRouter();
 
@@ -50,6 +49,13 @@ export default function Login() {
 
   const handleLogin = async (event) => {
     event.preventDefault();
+
+    let userType = "buyer";
+    if (tabIndex === 1) {
+      userType = "seller";
+    } else if (tabIndex === 2) {
+      userType = "advertiser";
+    }
 
     const result = await signIn("credentials", {
       redirect: true,
@@ -111,7 +117,7 @@ export default function Login() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
             />
-            <input type="hidden" name="userType" value={userType} />
+
             <Button
               type="submit"
               fullWidth

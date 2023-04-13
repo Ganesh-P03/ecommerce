@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { hash } from "bcryptjs";
 import mysql from "mysql2/promise";
 import { signIn } from "next-auth/react";
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST,
@@ -37,18 +39,8 @@ export default NextAuth({
 
           if (rows.length > 0) {
             const user = rows[0];
-            let passwordMatch = false;
-            //const hashedPassword = await hash(password, 10);
 
-            // if (hashedPassword === user.password) {
-            //   passwordMatch = true;
-            // }
-            // console.log(hashedPassword);
-            // console.log(passwordMatch);
-
-            if (password === user.password) {
-              passwordMatch = true;
-            }
+            const passwordMatch = await bcrypt.compare(password, user.password);
 
             if (!passwordMatch) {
               return null;
@@ -57,21 +49,11 @@ export default NextAuth({
             console.log(user);
             return user;
           } else {
-            return {
-              id: "1234",
-              name: "Doe",
-              email: "john@gmail.com",
-              role: "admin",
-            };
+            return null;
           }
         } catch (error) {
           console.error(error);
-          return {
-            id: "1234",
-            name: "awh",
-            email: "john@gmail.com",
-            role: "admin",
-          };
+          return null;
         }
       },
     }),
