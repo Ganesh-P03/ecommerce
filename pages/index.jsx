@@ -1,7 +1,8 @@
 import Layout from "@/components/layout";
 import { useSession } from "next-auth/react";
-import SellerDashboard from "@/components/seller";
+import SellerDashboard from "@/components/temp";
 import { useState } from "react";
+import AddProducts from "@/components/addProduct";
 
 export default function Index() {
   const { status, data } = useSession();
@@ -24,5 +25,5 @@ export default function Index() {
     }
   };
 
-  return <SellerDashboard />;
+  return <Layout />;
 }

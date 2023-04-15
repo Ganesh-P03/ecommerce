@@ -16,7 +16,7 @@ import AddIcon from "@mui/icons-material/Add";
 import SaveIcon from "@mui/icons-material/Save";
 import { useRouter } from "next/router";
 import axios from "axios";
-import Layout from "../components/Layout";
+import Layout from "./Layout";
 
 const styles = {
   list: {
@@ -32,13 +32,11 @@ const styles = {
   },
 };
 
-const SellerDashboard = (props) => {
+const Temp = (props) => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState("");
   const [editing, setEditing] = useState(false);
   const [editProduct, setEditProduct] = useState("");
-
-  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -142,4 +140,4 @@ const SellerDashboard = (props) => {
   );
 };
 
-export default SellerDashboard;
+export default Temp;

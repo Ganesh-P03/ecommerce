@@ -57,12 +57,20 @@ export default function Login() {
       userType = "advertiser";
     }
 
+    let url = "/";
+
+    if (userType === "seller") {
+      url = "/seller";
+    } else if (userType === "advertiser") {
+      url = "/advertiser";
+    }
+
     const result = await signIn("credentials", {
       redirect: true,
       username: username,
       password: password,
       userType: userType,
-      callbackUrl: "/home",
+      callbackUrl: url,
     });
   };
 
