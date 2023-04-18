@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { hash } from "bcryptjs";
 import mysql from "mysql2/promise";
-import { signIn } from "next-auth/react";
+
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
@@ -64,7 +64,7 @@ export default NextAuth({
 
   callbacks: {
     jwt(params) {
-      console.log(params);
+      //console.log(params);
       if (params.user?.role) {
         params.token.role = params.user.role;
       }

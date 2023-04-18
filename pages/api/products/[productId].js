@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         "SELECT * FROM products WHERE sId = ?",
         [req.query.productId]
       );
-
+      connection.release();
       res.status(200).json(rows);
     }
 
