@@ -176,7 +176,10 @@ export default function PrimarySearchAppBar() {
             variant="h6"
             noWrap
             component="div"
-            sx={{ display: { xs: "none", sm: "block" } }}
+            sx={{ display: { xs: "none", sm: "block" }, cursor: "pointer" }}
+            onClick={() => {
+              router.push("/");
+            }}
           >
             Ecom
           </Typography>
@@ -200,7 +203,11 @@ export default function PrimarySearchAppBar() {
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <IconButton size="large" aria-label="Cart" color="inherit">
-              <ShoppingCartIcon />
+              <ShoppingCartIcon
+                onClick={() => {
+                  router.push("/cart");
+                }}
+              />
             </IconButton>
             <IconButton
               size="large"

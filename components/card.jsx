@@ -11,10 +11,15 @@ import {
 import axios from "axios";
 
 const addTocart = async (pId, id) => {
-  console.log("Added to cart");
   try {
+    if (id === -1) {
+      alert("Please Login to add to cart");
+      return;
+    }
+
     const response = await axios.post(`/api/cart/${id}`, {
       pId: pId,
+      quantity: 1,
     });
     console.log(response);
   } catch (err) {
