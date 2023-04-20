@@ -12,7 +12,9 @@ const Footer = () => {
         backgroundColor: "#f5f5f5",
       }}
     >
-      <Typography variant="subtitle1">&copy; 2023 Ganesh Priyatham</Typography>
+      <Typography variant="subtitle1">
+        &copy; {new Date().getFullYear()} Ganesh Priyatham
+      </Typography>
     </Box>
   );
 };

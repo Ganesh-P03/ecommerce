@@ -7,48 +7,122 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Layout from "../components/Layout";
-import AddressForm from "../components/AddressForm";
-import PaymentForm from "../components/PaymentForm";
-import Review from "../components/Review";
+import PaymentForm from "../components/paymentForm";
+import Review from "../components/review";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import PendingIcon from "@mui/icons-material/Pending";
+import axios from "axios";
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
-const steps = ["Shipping address", "Payment details", "Review your order"];
-
-function getStepContent(step) {
-  switch (step) {
-    case 0:
-      return <AddressForm />;
-    case 1:
-      return <PaymentForm />;
-    case 2:
-      return <Review />;
-    default:
-      throw new Error("Unknown step");
-  }
-}
+const steps = ["Review your order", "Payment"];
 
 const theme = createTheme();
 
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
+  const { status, data } = useSession();
 
-  const handleNext = () => {
+  const [cardName, setCardName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expDate, setExpDate] = useState("");
+  const [cvv, setCvv] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  const handlePlaceOrder = async () => {
+    setLoading(true);
+
+    try {
+      if (status === "authenticated" && data.token.role === "buyer") {
+        const response = await axios.get(`/api/cart/${data.token.id}`);
+        const cartItems = response.data;
+        const total = cartItems.reduce((acc, item) => {
+          return acc + item.price * item.qty;
+        }, 0);
+
+        //check if card is valid
+        //check if card has enough funds
+        const card = {
+          name: cardName,
+          accountNumber: cardNumber,
+          total: total,
+          cvv: cvv,
+          expiryDate: expDate,
+        };
+
+        const paymentResponse = await axios.post("/api/payment", card);
+
+        if (!paymentResponse.data.success) {
+          setLoading(false);
+          return;
+        }
+
+        const order = {
+          buyer_id: data.token.id,
+          total,
+          items: cartItems,
+        };
+        await axios.post("/api/orders", order);
+        await axios.delete(`/api/cart/${data.token.id}`);
+        router.push("/orders");
+        return;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+    setLoading(false);
+  };
+
+  function getStepContent(step) {
+    if (loading) {
+      return (
+        <>
+          <PendingIcon />
+          <h1>Please wait while we process your order</h1>
+        </>
+      );
+    }
+
+    switch (step) {
+      case 0:
+        return <Review id={status === "authenticated" ? data.token.id : -1} />;
+
+      case 1:
+        return (
+          <PaymentForm
+            cardName={setCardName}
+            cardNumber={setCardNumber}
+            expDate={setExpDate}
+            cvv={setCvv}
+          />
+        );
+      case 2:
+        return (
+          <>
+            <PendingIcon />
+            <h1>Please wait while we process your order</h1>
+          </>
+        );
+      default:
+        throw new Error("Unknown step");
+    }
+  }
+
+  const handleNext = async () => {
+    if (activeStep === steps.length - 1) {
+      //disable button
+      //show loading
+      //make api call to place order
+      //redirect to orders page
+
+      await handlePlaceOrder();
+
+      return;
+    }
     setActiveStep(activeStep + 1);
   };
 
@@ -76,16 +150,7 @@ export default function Checkout() {
               ))}
             </Stepper>
             {activeStep === steps.length ? (
-              <React.Fragment>
-                <Typography variant="h5" gutterBottom>
-                  Thank you for your order.
-                </Typography>
-                <Typography variant="subtitle1">
-                  Your order number is #2001539. We have emailed your order
-                  confirmation, and will send you an update when your order has
-                  shipped.
-                </Typography>
-              </React.Fragment>
+              <React.Fragment>{getStepContent(activeStep)}</React.Fragment>
             ) : (
               <React.Fragment>
                 {getStepContent(activeStep)}
@@ -100,6 +165,7 @@ export default function Checkout() {
                     variant="contained"
                     onClick={handleNext}
                     sx={{ mt: 3, ml: 1 }}
+                    className="orderBtn"
                   >
                     {activeStep === steps.length - 1 ? "Place order" : "Next"}
                   </Button>
@@ -107,7 +173,6 @@ export default function Checkout() {
               </React.Fragment>
             )}
           </Paper>
-          <Copyright />
         </Container>
       </ThemeProvider>
     </Layout>

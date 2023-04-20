@@ -46,10 +46,18 @@ export default async function handler(req, res) {
     res.status(200).json(rows);
   } else if (req.method === "DELETE") {
     const connection = await pool.getConnection();
-    const [rows] = await connection.query(
-      "DELETE FROM cart WHERE cId = ? AND pId = ?",
-      [req.query.cart, req.body.pId]
-    );
+
+    if (req.body.pId === undefined) {
+      const [rows] = await connection.query("DELETE FROM cart WHERE cId = ?", [
+        req.query.cart,
+      ]);
+    } else {
+      const [rows] = await connection.query(
+        "DELETE FROM cart WHERE cId = ? AND pId = ?",
+        [req.query.cart, req.body.pId]
+      );
+    }
+
     connection.release();
     res.status(200).json(rows);
   }
