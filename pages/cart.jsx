@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/router";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Typography, Button, Grid, Paper } from "@mui/material";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 
 import axios from "axios";
 
@@ -29,17 +31,29 @@ const Cart = () => {
     getCartItems();
   }, [getCartItems]);
 
-  //   const handleDeleteItem = (id) => {
-  //     const updatedCartItems = cartItems.filter((item) => item.id !== id);
-  //     setCartItems(updatedCartItems);
-  //   };
+  const handleDeleteItem = async (id) => {
+    // const updatedCartItems = cartItems.filter((item) => item.id === id);
+    // setcartItems(updatedCartItems);
+    console.log(id);
+    try {
+      await axios.delete(`/api/cart/${data.token.id}`, {
+        data: {
+          pId: id,
+        },
+      });
 
-  //   const getTotalPrice = () => {
-  //     const total = cartItems.reduce((acc, item) => {
-  //       return acc + item.price * item.qty;
-  //     }, 0);
-  //     return total;
-  //   };
+      setcartItems((prev) => prev.filter((item) => item.pId !== id));
+    } catch (err) {
+      alert(`Try again later ${err}`);
+    }
+  };
+
+  const getTotalPrice = () => {
+    const total = cartItems.reduce((acc, item) => {
+      return acc + item.pCost * item.quantity;
+    }, 0);
+    return total;
+  };
 
   const styles = {
     root: {
@@ -110,16 +124,63 @@ const Cart = () => {
                     ${item.pCost}
                   </Typography>
                   <div style={styles.itemQty}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      startIcon={<RemoveCircleIcon />}
+                      disabled={item.quantity === 1}
+                      onClick={() => {
+                        axios.put(`/api/cart/${data.token.id}`, {
+                          pId: item.pId,
+                          quantity: item.quantity - 1,
+                        });
+                        setcartItems((prev) =>
+                          prev.map((old) =>
+                            old.pId === item.pId
+                              ? { ...old, quantity: old.quantity - 1 }
+                              : old
+                          )
+                        );
+                      }}
+                    >
+                      -
+                    </Button>
                     <Typography variant="body2">
                       Quantity: {item.quantity}
                     </Typography>
+
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      startIcon={<AddCircleIcon />}
+                      disabled={item.quantity === item.pQty}
+                      onClick={() => {
+                        axios.put(`/api/cart/${data.token.id}`, {
+                          pId: item.pId,
+                          quantity: item.quantity + 1,
+                        });
+                        //increase quantity of that item in cart
+                        setcartItems((prev) =>
+                          prev.map((old) =>
+                            old.pId === item.pId
+                              ? { ...old, quantity: old.quantity + 1 }
+                              : old
+                          )
+                        );
+                      }}
+                    >
+                      +
+                    </Button>
+
                     <Button
                       variant="outlined"
                       color="secondary"
                       size="small"
                       startIcon={<DeleteIcon />}
                       style={styles.deleteBtn}
-                      //onClick={() => handleDeleteItem(item.id)}
+                      onClick={() => handleDeleteItem(item.pId)}
                     >
                       Delete
                     </Button>
@@ -133,10 +194,9 @@ const Cart = () => {
           ))}
         </Grid>
 
-        {/*getTotalPrice()*/}
         <div style={styles.total}>
           <Typography variant="h5" style={styles.totalText}>
-            Total:
+            Total:{getTotalPrice()}
           </Typography>
           <Button
             variant="contained"

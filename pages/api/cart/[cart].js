@@ -30,12 +30,31 @@ export default async function handler(req, res) {
     res.status(200).json(response);
   } else if (req.method === "POST") {
     const connection = await pool.getConnection();
+
+    //check if product already exists in cart
     const [rows] = await connection.query(
-      "INSERT INTO cart (cId, pId, quantity) VALUES (?, ?, ?)",
-      [req.query.cart, req.body.pId, req.body.quantity]
+      "SELECT * FROM cart WHERE cId = ? AND pId = ?",
+      [req.query.cart, req.body.pId]
     );
+
+    let updatedRows;
+
+    if (rows.length > 0) {
+      //update quantity
+      [updatedRows] = await connection.query(
+        "UPDATE cart SET quantity = ? WHERE cId = ? AND pId = ?",
+        [req.body.quantity + rows[0].quantity, req.query.cart, req.body.pId]
+      );
+    } else {
+      //add product to cart
+      [updatedRows] = await connection.query(
+        "INSERT INTO cart (cId, pId, quantity) VALUES (?, ?, ?)",
+        [req.query.cart, req.body.pId, req.body.quantity]
+      );
+    }
+
     connection.release();
-    res.status(200).json(rows);
+    res.status(200).json(updatedRows);
   } else if (req.method === "PUT") {
     const connection = await pool.getConnection();
     const [rows] = await connection.query(
@@ -51,12 +70,16 @@ export default async function handler(req, res) {
       const [rows] = await connection.query("DELETE FROM cart WHERE cId = ?", [
         req.query.cart,
       ]);
-    } else {
-      const [rows] = await connection.query(
-        "DELETE FROM cart WHERE cId = ? AND pId = ?",
-        [req.query.cart, req.body.pId]
-      );
+
+      connection.release();
+      res.status(200).json(rows);
+      return;
     }
+
+    const [rows] = await connection.query(
+      "DELETE FROM cart WHERE cId = ? AND pId = ?",
+      [req.query.cart, req.body.pId]
+    );
 
     connection.release();
     res.status(200).json(rows);

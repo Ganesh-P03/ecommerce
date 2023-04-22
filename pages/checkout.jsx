@@ -40,7 +40,7 @@ export default function Checkout() {
         const response = await axios.get(`/api/cart/${data.token.id}`);
         const cartItems = response.data;
         const total = cartItems.reduce((acc, item) => {
-          return acc + item.price * item.qty;
+          return acc + item.pCost * item.quantity;
         }, 0);
 
         //check if card is valid
@@ -53,22 +53,23 @@ export default function Checkout() {
           expiryDate: expDate,
         };
 
-        const paymentResponse = await axios.post("/api/payment", card);
+        const paymentResponse = await axios.post("/api/bank/payment", card);
+        console.log(paymentResponse);
 
-        if (!paymentResponse.data.success) {
+        if (paymentResponse.status === 200) {
+          const order = {
+            cId: data.token.id,
+            items: cartItems,
+          };
+          await axios.post("/api/orders", order);
+          await axios.delete(`/api/cart/${data.token.id}`);
+          //alert("Order placed successfully");
+
+          router.push("/orders");
+        } else {
           setLoading(false);
           return;
         }
-
-        const order = {
-          buyer_id: data.token.id,
-          total,
-          items: cartItems,
-        };
-        await axios.post("/api/orders", order);
-        await axios.delete(`/api/cart/${data.token.id}`);
-        router.push("/orders");
-        return;
       }
     } catch (err) {
       console.log(err);
@@ -120,8 +121,6 @@ export default function Checkout() {
       //redirect to orders page
 
       await handlePlaceOrder();
-
-      return;
     }
     setActiveStep(activeStep + 1);
   };
