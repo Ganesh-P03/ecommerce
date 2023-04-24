@@ -6,7 +6,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Typography, Button, Grid, Paper } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-
 import axios from "axios";
 
 const Cart = () => {
@@ -203,7 +202,7 @@ const Cart = () => {
             color="primary"
             style={styles.checkoutBtn}
             onClick={() => {
-              router.push("/checkout");
+              router.push("/checkout/?total=" + getTotalPrice());
             }}
           >
             Checkout

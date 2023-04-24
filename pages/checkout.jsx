@@ -16,6 +16,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import PendingIcon from "@mui/icons-material/Pending";
 import axios from "axios";
+import { useRouter } from "next/router";
 
 const steps = ["Review your order", "Payment"];
 
@@ -24,11 +25,14 @@ const theme = createTheme();
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
   const { status, data } = useSession();
+  const router = useRouter();
 
   const [cardName, setCardName] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [expDate, setExpDate] = useState("");
   const [cvv, setCvv] = useState("");
+
+  const [cartItems, setCartItems] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -37,18 +41,18 @@ export default function Checkout() {
 
     try {
       if (status === "authenticated" && data.token.role === "buyer") {
-        const response = await axios.get(`/api/cart/${data.token.id}`);
-        const cartItems = response.data;
-        const total = cartItems.reduce((acc, item) => {
-          return acc + item.pCost * item.quantity;
-        }, 0);
-
         //check if card is valid
         //check if card has enough funds
+
+        if (router.query.total) {
+        } else {
+          alert("Please add items to your cart");
+          return;
+        }
         const card = {
           name: cardName,
           accountNumber: cardNumber,
-          total: total,
+          total: router.query.total,
           cvv: cvv,
           expiryDate: expDate,
         };
@@ -57,11 +61,11 @@ export default function Checkout() {
         console.log(paymentResponse);
 
         if (paymentResponse.status === 200) {
-          const order = {
+          await axios.post("/api/orders", {
             cId: data.token.id,
-            items: cartItems,
-          };
-          await axios.post("/api/orders", order);
+            cAccountNumber: cardNumber,
+          });
+
           await axios.delete(`/api/cart/${data.token.id}`);
           //alert("Order placed successfully");
 
@@ -90,7 +94,12 @@ export default function Checkout() {
 
     switch (step) {
       case 0:
-        return <Review id={status === "authenticated" ? data.token.id : -1} />;
+        return (
+          <Review
+            id={status === "authenticated" ? data.token.id : -1}
+            cart={setCartItems}
+          />
+        );
 
       case 1:
         return (

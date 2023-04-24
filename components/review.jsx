@@ -39,7 +39,9 @@ export default function Review(props) {
     );
 
     setProducts(response.data);
-  }, [props.id]);
+
+    props.cart(response.data);
+  }, [props]);
 
   React.useEffect(() => {
     getProducts();
