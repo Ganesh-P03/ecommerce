@@ -6,12 +6,6 @@ export default async function handler(req, res) {
     const [rows] = await connection.query("SELECT * FROM cart WHERE cId = ?", [
       req.query.cart,
     ]);
-    //get product details from products table using pId
-
-    /*
-
-
-    */
 
     let response = [];
 
