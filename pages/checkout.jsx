@@ -64,6 +64,7 @@ export default function Checkout() {
           await axios.post("/api/orders", {
             cId: data.token.id,
             cAccountNumber: cardNumber,
+            revertBack: "0",
           });
 
           await axios.delete(`/api/cart/${data.token.id}`);

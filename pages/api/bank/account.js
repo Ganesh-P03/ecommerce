@@ -1,5 +1,6 @@
 import connectMongo from "@/config/connectMongo";
 import Account from "../../../models/account";
+import pool from "../../../config/mysql";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -22,23 +23,24 @@ export default async function handler(req, res) {
 
     res.status(200).json({ message: "Account created successfully" });
   } else if (req.method === "GET") {
-    //find account by accountNumber
-    // const account = await Account.findOne({
-    //   accountNumber: req.query.accountNumber,
-    // });
-    // if (account) {
-    //   res.status(200).json(account);
-    // } else {
-    //   res.status(400).json({ message: "Account does not exist" });
-    // }
+    const id = req.query.id;
+    const connection = await pool.getConnection();
 
-    //find all accounts
+    //get account number of that id from wallet table
+    const [rows] = await connection.query(
+      "SELECT accountNumber FROM wallet WHERE id = ?",
+      [id]
+    );
 
-    const accounts = await Account.find();
-    if (accounts) {
-      res.status(200).json(accounts);
-    } else {
-      res.status(400).json({ message: "No accounts found" });
-    }
+    connection.release();
+
+    await connectMongo();
+
+    //get account details from account table
+    const account = await Account.findOne({
+      accountNumber: rows[0].accountNumber,
+    });
+
+    res.status(200).json(account);
   }
 }

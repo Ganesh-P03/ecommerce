@@ -5,7 +5,7 @@ import Account from "../../models/account";
 export default async function handler(req, res) {
   if (req.method === "POST") {
     try {
-      const { cId, cAccountNumber } = req.body;
+      const { cId, cAccountNumber, revertBack } = req.body;
 
       //create connection
       const connection = await pool.getConnection();
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
           //amount = 49900*2 - 9980 = 89820
 
           //seller will get 89820
-          //giver will get 9980
+          //giver will give 9980
 
           item["amount"] = amount;
           item["offerId"] = offer.offerId;
@@ -98,25 +98,49 @@ export default async function handler(req, res) {
 
       //add amount to be paid and discount to be deducted in balance of the account
       //update the balance of the account
-      for (let accountNumber in amountToBePaid) {
-        await Account.updateOne(
-          { accountNumber: accountNumber },
-          { $inc: { balance: amountToBePaid[accountNumber] } }
-        );
+      if (revertBack === "0") {
+        for (let accountNumber in amountToBePaid) {
+          await Account.updateOne(
+            { accountNumber: accountNumber },
+            { $inc: { balance: amountToBePaid[accountNumber] } }
+          );
+        }
+
+        //update the balance of the account
+        for (let accountNumber in discountToBeDeducted) {
+          await Account.updateOne(
+            { accountNumber: accountNumber },
+            { $inc: { balance: -discountToBeDeducted[accountNumber] } }
+          );
+        }
       }
+      //revert back the changes
+      // else {
+      //   let amontToBeRevertedToCustomer = 0;
 
-      //update the balance of the account
-      for (let accountNumber in discountToBeDeducted) {
-        await Account.updateOne(
-          { accountNumber: accountNumber },
-          { $inc: { balance: -discountToBeDeducted[accountNumber] } }
-        );
-      }
+      //   for (let accountNumber in amountToBePaid) {
+      //     amontToBeRevertedToCustomer += amountToBePaid[accountNumber];
+      //     await Account.updateOne(
+      //       { accountNumber: accountNumber },
+      //       { $inc: { balance: -amountToBePaid[accountNumber] } }
+      //     );
+      //   }
 
-      //release the connection to the mongo database
-      // mongoConnection.close();
+      //   //update the balance of the account
+      //   for (let accountNumber in discountToBeDeducted) {
+      //     await Account.updateOne(
+      //       { accountNumber: accountNumber },
+      //       { $inc: { balance: discountToBeDeducted[accountNumber] } }
+      //     );
+      //   }
 
-      //get the connection to the mysql database
+      //   //update the balance of the customer
+      //   await Account.updateOne(
+      //     { accountNumber: cAccountNumber },
+      //     { $inc: { balance: amontToBeRevertedToCustomer } }
+      //   );
+      // }
+
       const con = await pool.getConnection();
 
       //insert into orders table

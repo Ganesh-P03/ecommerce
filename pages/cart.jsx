@@ -49,7 +49,7 @@ const Cart = () => {
 
   const getTotalPrice = () => {
     const total = cartItems.reduce((acc, item) => {
-      return acc + item.pCost * item.quantity;
+      return acc + item.netPrice * item.quantity;
     }, 0);
     return total;
   };
@@ -120,7 +120,7 @@ const Cart = () => {
                     {item.pName}
                   </Typography>
                   <Typography variant="body2" style={styles.itemPrice}>
-                    ${item.pCost}
+                    ${item.netPrice}
                   </Typography>
                   <div style={styles.itemQty}>
                     <Button
@@ -186,7 +186,7 @@ const Cart = () => {
                   </div>
                 </div>
                 <Typography variant="body2" style={styles.itemTotal}>
-                  ${item.pCost * item.quantity}
+                  ${item.netPrice * item.quantity}
                 </Typography>
               </Paper>
             </Grid>

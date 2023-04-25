@@ -3,25 +3,51 @@ import pool from "../../../config/mysql";
 export default async function handler(req, res) {
   if (req.method === "GET") {
     const connection = await pool.getConnection();
-    const [rows] = await connection.query("SELECT * FROM cart WHERE cId = ?", [
-      req.query.cart,
-    ]);
 
-    let response = [];
+    /*
+      tables
+      cart
+      products
+      offers
 
-    for (let row of rows) {
-      const [product] = await connection.query(
-        "SELECT * FROM products WHERE pId = ?",
-        [row.pId]
-      );
+      calculate new thing name netPrice = price - discount
 
-      product[0].quantity = row.quantity;
+      SELECT * FROM cart WHERE cId = 1
 
-      response.push(product[0]);
+      SELECT * FROM cart JOIN products ON cart.pId = products.pId WHERE cId = 1
+
+      SELECT * FROM cart JOIN products ON cart.pId = products.pId JOIN offers ON cart.pId = offers.pId WHERE cId = 1 AND offers.startDate <= CURDATE() AND offers.endDate >= CURDATE()
+
+      Dont loose any data from cart table if offer is not applicable
+
+      SELECT * FROM cart JOIN products ON cart.pId = products.pId LEFT JOIN offers ON cart.pId = offers.pId WHERE cId = 1 AND offers.startDate <= CURDATE() AND offers.endDate >= CURDATE()
+
+      some products may not have offers, so we need to use left join
+
+
+      if offer is not applicable, then where will be null in the offer columns
+      so we need to check if offer is null or not
+
+      select * from cart join products on cart.pId = products.pId left join offers on cart.pId = offers.pId where cId = 1 and (offers.startDate <= CURDATE() and offers.endDate >= CURDATE() or offers.startDate is null)
+
+    */
+
+    const [rows] = await connection.query(
+      "SELECT * FROM cart JOIN products ON cart.pId = products.pId LEFT JOIN offers ON cart.pId = offers.pId WHERE cId = ? AND (offers.startDate <= CURDATE() AND offers.endDate >= CURDATE() OR offers.startDate IS NULL)",
+      [req.query.cart]
+    );
+
+    //calculate netPrice
+    for (let item of rows) {
+      if (item.discount === null) {
+        item.netPrice = item.pCost;
+      } else {
+        item.netPrice = item.pCost * (1 - item.discount / 100);
+      }
     }
 
     connection.release();
-    res.status(200).json(response);
+    res.status(200).json(rows);
   } else if (req.method === "POST") {
     const connection = await pool.getConnection();
 
@@ -79,3 +105,24 @@ export default async function handler(req, res) {
     res.status(200).json(rows);
   }
 }
+
+/*
+
+const [rows] = await connection.query("SELECT * FROM cart WHERE cId = ?", [
+      req.query.cart,
+    ]);
+
+    let response = [];
+
+    for (let row of rows) {
+      const [product] = await connection.query(
+        "SELECT * FROM products WHERE pId = ?",
+        [row.pId]
+      );
+
+      product[0].quantity = row.quantity;
+
+      response.push(product[0]);
+    }
+
+*/

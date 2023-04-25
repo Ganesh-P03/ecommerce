@@ -31,8 +31,9 @@ import LayersIcon from "@mui/icons-material/Layers";
 import AddProduct from "./addProduct";
 import Products from "./products";
 import AddItems from "./addItems";
-import { Button } from "@mui/material";
-
+import Returns from "./returns";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
 // import { mainListItems } from "./listItems";
 // import Chart from "./Chart";
 // import Deposits from "./Deposits";
@@ -93,6 +94,7 @@ function DashboardContent(props) {
   };
 
   const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [Balance, setBalance] = useState(0);
 
   const mainListItems = (
     <React.Fragment>
@@ -169,7 +171,7 @@ function DashboardContent(props) {
                 <React.Fragment>
                   <Title>Balance</Title>
                   <Typography component="p" variant="h4">
-                    $3,024.00
+                    ${Balance}
                   </Typography>
                   <Typography color="text.secondary" sx={{ flex: 1 }}>
                     {new Date().toDateString()}
@@ -200,9 +202,18 @@ function DashboardContent(props) {
     } else if (selectedIndex === 4) {
       return <AddItems id={props.id} />;
     } else if (selectedIndex === 5) {
-      return <h1>Returns</h1>;
+      return <Returns id={props.id} />;
     }
   };
+
+  const getBalance = useCallback(async () => {
+    const response = await axios.get(`/api/bank/account/?id=${props.id}`);
+    setBalance(response.data.balance);
+  }, [props.id]);
+
+  useEffect(() => {
+    getBalance();
+  }, [getBalance]);
 
   return (
     <ThemeProvider theme={mdTheme}>

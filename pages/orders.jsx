@@ -26,6 +26,32 @@ const Orders = () => {
     getOrders();
   }, [getOrders]);
 
+  const handleReturnProduct = async (orderIndex, productIndex) => {
+    try {
+      //pop up a dialog to ask reason for return and then send it to the backend
+      const reason = prompt("Please enter the reason for return");
+      if (reason == null || reason == "") {
+        alert("Please enter the reason for return");
+        return;
+      }
+
+      const response = await axios.post("/api/return", {
+        oId: orders[orderIndex].oId,
+        pId: orders[orderIndex].items[productIndex].pId,
+        rDesc: reason,
+        rStatus: 0,
+      });
+
+      if (response.status === 200) {
+        alert("Return request sent successfully");
+      } else {
+        alert("Return request failed");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <Layout>
       <Grid container spacing={2}>
@@ -55,9 +81,9 @@ const Orders = () => {
                         <Button
                           variant="contained"
                           color="primary"
-                          //   onClick={() =>
-                          //     handleReturnProduct(orderIndex, productIndex)
-                          //   }
+                          onClick={() =>
+                            handleReturnProduct(orderIndex, productIndex)
+                          }
                         >
                           Return
                         </Button>

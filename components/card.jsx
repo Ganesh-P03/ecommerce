@@ -45,9 +45,51 @@ const CardComponent = (props) => {
           <Typography variant="body2" color="textSecondary" component="p">
             {props.pDesc}
           </Typography>
-          <Typography variant="h6" color="primary" component="p">
-            ${props.pCost}
-          </Typography>
+          {console.log(props.offers)}
+
+          {props.offers != null ? (
+            <Typography variant="body2" color="text.secondary" component="div">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                component="div"
+              >
+                <strike>₹{props.pCost}</strike>
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                component="div"
+              >
+                ₹{props.pCost - (props.pCost * props.offers.discount) / 100}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                component="div"
+              >
+                <b>
+                  {props.offers.discount}% off on {props.offers.offerName}
+                </b>
+              </Typography>
+
+              {/*badges with start and end date*/}
+
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                component="div"
+              >
+                <b>Start Date: {props.offers.startDate}</b>
+                <br />
+                <b>End Date: {props.offers.endDate}</b>
+              </Typography>
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="text.secondary" component="div">
+              ₹{props.pCost}
+            </Typography>
+          )}
         </CardContent>
 
         {props.pQty > 0 ? (
