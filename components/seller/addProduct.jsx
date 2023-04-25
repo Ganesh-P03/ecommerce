@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 
 import {
   TextField,
@@ -64,20 +64,11 @@ const AddProduct = (props) => {
   const [itemQuantity, setItemQuantity] = useState("");
   const [warehouse, setWarehouse] = useState("");
   const [items, setItems] = useState([]);
+  const [wNames, setWNames] = useState([]);
 
-  const handleAddItem = () => {
-    if (itemQuantity && warehouse) {
-      setItems([...items, { itemQuantity, warehouse }]);
-      setItemQuantity("");
-      setWarehouse("");
-    }
-  };
-
-  const handleDeleteItem = (index) => {
-    const newItems = [...items];
-    newItems.splice(index, 1);
-    setItems(newItems);
-  };
+  // const getWarehouseName = useCallback(async (id) => {
+  //   const result = await axios.get(`/api/warehouses`);
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -163,42 +154,8 @@ const AddProduct = (props) => {
             value={warehouse}
             onChange={(e) => setWarehouse(e.target.value)}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            style={styles.addButton}
-            onClick={handleAddItem}
-          >
-            <AddIcon />
-          </Button>
         </div>
-        <TableContainer component={Paper} style={styles.tableContainer}>
-          <Table>
-            <TableHead style={styles.tableHead}>
-              <TableRow>
-                <TableCell>Item Quantity</TableCell>
-                <TableCell>Warehouse</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>{item.itemQuantity}</TableCell>
-                  <TableCell>{item.warehouse}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      style={styles.deleteButton}
-                      onClick={() => handleDeleteItem(index)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+
         <Grid container justify="flex-end">
           <Grid item>
             <Button variant="contained" color="primary" type="submit">

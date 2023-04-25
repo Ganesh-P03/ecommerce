@@ -74,11 +74,11 @@ export default function Review(props) {
           <ListItem key={product.pId} sx={{ py: 1, px: 0 }}>
             <ListItemText primary={product.pName} sx={{ flex: 1 }} />
             <Typography variant="body2" sx={{ flex: 1 }}>
-              {product.pCost}
+              {product.netPrice}
             </Typography>
             <ListItemText primary={product.quantity} sx={{ flex: 1 }} />
             <Typography variant="body2">
-              {product.pCost * product.quantity}
+              {product.netPrice * product.quantity}
             </Typography>
           </ListItem>
         ))}
@@ -87,7 +87,7 @@ export default function Review(props) {
           <ListItemText primary="Total" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
             {products.reduce((acc, curr) => {
-              return acc + curr.pCost * curr.quantity;
+              return acc + curr.netPrice * curr.quantity;
             }, 0)}
           </Typography>
         </ListItem>

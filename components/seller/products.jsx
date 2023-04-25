@@ -32,20 +32,36 @@ const Products = (props) => {
   //     setProducts(result.data);
   //   };
 
-  const handleDeleteProduct = async (e) => {
-    console.log(e.target.value);
-    const result = await axios.delete(`/api/products/${e.target.value}`);
+  const handleDeleteProduct = async (pId) => {
+    console.log(pId);
+    const result = await axios.delete(`/api/products/${pId}`);
 
     //remove the deleted product from the list
-    const newProducts = products.filter(
-      (product) => product.pId != e.target.value
-    );
+    const newProducts = products.filter((product) => product.pId != pId);
     setProducts(newProducts);
     //setProducts(result.data);
   };
 
-  const handleEditProduct = async (e) => {
-    console.log(e.target.value);
+  const handleEditProduct = async (pId) => {
+    console.log(pId);
+
+    try {
+      let newQty = prompt("Enter new quantity");
+      const result = await axios.put(`/api/products/${pId}`, {
+        pQty: newQty,
+      });
+
+      //update the quantity of the product in the list
+      const newProducts = products.map((product) => {
+        if (product.pId == pId) {
+          product.pQty = newQty;
+        }
+        return product;
+      });
+      setProducts(newProducts);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const renderBody = () => {
@@ -66,7 +82,7 @@ const Products = (props) => {
                 variant="contained"
                 color="primary"
                 value={product.pId}
-                onClick={handleEditProduct}
+                onClick={(e) => handleEditProduct(e.target.value)}
                 startIcon={<EditIcon />}
               >
                 Edit
@@ -77,7 +93,7 @@ const Products = (props) => {
                 variant="contained"
                 color="primary"
                 value={product.pId}
-                onClick={handleDeleteProduct}
+                onClick={(e) => handleDeleteProduct(e.target.value)}
                 startIcon={<DeleteIcon />}
               >
                 Delete

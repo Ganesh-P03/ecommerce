@@ -46,11 +46,11 @@ export default async function handler(req, res) {
     //http://localhost:3000/api/products/{pId}
     if (req.method === "PUT") {
       const connection = await pool.getConnection();
-      const { pName, pDesc, pImg, pCost, pQty } = req.body;
-      const sId = req.query.productId;
+      const { pQty } = req.body;
+
       const [rows] = await connection.query(
-        "UPDATE products SET pName = ?, pDesc = ?, pImg = ?, pCost = ?, pQty = ? WHERE pId = ?",
-        [pName, pDesc, pImg, pCost, pQty, req.query.productId]
+        "UPDATE products SET pQty = ? WHERE pId = ?",
+        [pQty, req.query.productId]
       );
       connection.release();
       res.status(200).json(rows);

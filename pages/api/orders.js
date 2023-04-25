@@ -114,32 +114,6 @@ export default async function handler(req, res) {
           );
         }
       }
-      //revert back the changes
-      // else {
-      //   let amontToBeRevertedToCustomer = 0;
-
-      //   for (let accountNumber in amountToBePaid) {
-      //     amontToBeRevertedToCustomer += amountToBePaid[accountNumber];
-      //     await Account.updateOne(
-      //       { accountNumber: accountNumber },
-      //       { $inc: { balance: -amountToBePaid[accountNumber] } }
-      //     );
-      //   }
-
-      //   //update the balance of the account
-      //   for (let accountNumber in discountToBeDeducted) {
-      //     await Account.updateOne(
-      //       { accountNumber: accountNumber },
-      //       { $inc: { balance: discountToBeDeducted[accountNumber] } }
-      //     );
-      //   }
-
-      //   //update the balance of the customer
-      //   await Account.updateOne(
-      //     { accountNumber: cAccountNumber },
-      //     { $inc: { balance: amontToBeRevertedToCustomer } }
-      //   );
-      // }
 
       const con = await pool.getConnection();
 
@@ -155,6 +129,14 @@ export default async function handler(req, res) {
           "INSERT INTO purchase_details(oId,pId,quantity,offerId,price) VALUES(?,?,?,?,?)",
           [result.insertId, item.pId, item.quantity, item.offerId, item.amount]
         );
+      }
+
+      //decrease pQty from products table
+      for (let item of cart) {
+        await con.query("UPDATE products SET pQty = pQty - ? WHERE pId = ?", [
+          item.quantity,
+          item.pId,
+        ]);
       }
 
       res.status(200).json({ message: "Order Placed" });

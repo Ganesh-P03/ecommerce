@@ -75,7 +75,10 @@ const Orders = () => {
                       <Typography variant="h6">{item.name}</Typography>
                       <Typography variant="subtitle1">{item.desc}</Typography>
                       <Typography variant="subtitle2">
-                        Price: ${item.price} x {item.quantity}
+                        Price: ${item.price}
+                      </Typography>
+                      <Typography variant="subtitle2">
+                        Quantity: {item.quantity}
                       </Typography>
                       {!item.returned && (
                         <Button
