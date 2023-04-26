@@ -1,6 +1,7 @@
 import pool from "../../config/mysql";
 import connectMongo from "@/config/connectMongo";
 import Account from "../../models/account";
+const nodemailer = require("nodemailer");
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -42,10 +43,6 @@ export default async function handler(req, res) {
 
         SELECT * FROM returns JOIN products ON returns.pId = products.pId JOIN orders ON returns.oId = orders.oId JOIN purchase_details ON returns.oId = purchase_details.oId AND returns.pId = purchase_details.pId WHERE products.sId = 1;
 
-
-
-
-
     */
 
     const [returns] = await connection.query(
@@ -71,11 +68,11 @@ export default async function handler(req, res) {
 
       if (rStatus == 1) {
         const [rows] = await connection.query(
-          "SELECT account, price, sId, offerId, pCost FROM returns JOIN products ON returns.pId = products.pId JOIN orders ON returns.oId = orders.oId JOIN purchase_details ON returns.oId = purchase_details.oId AND returns.pId = purchase_details.pId WHERE returns.rId = ?",
+          "SELECT account, price, sId, offerId, pCost,cId FROM returns JOIN products ON returns.pId = products.pId JOIN orders ON returns.oId = orders.oId JOIN purchase_details ON returns.oId = purchase_details.oId AND returns.pId = purchase_details.pId WHERE returns.rId = ?",
           [rId]
         );
 
-        const { account, price, sId, offerId, pCost } = rows[0];
+        const { account, price, sId, offerId, pCost, cId } = rows[0];
 
         const amountToBeAddedToCustomer = price;
         const amountToBeDeductedFromSeller = pCost;
@@ -133,6 +130,47 @@ export default async function handler(req, res) {
             { $inc: { balance: amountToBeAddedToAdvertiser } }
           );
         }
+
+        //create connection
+        const connection2 = await pool.getConnection();
+
+        //get customer Email address from users table
+        const [query4] = await connection2.query(
+          "SELECT email FROM users WHERE id = ?",
+          [cId]
+        );
+
+        const customerEmail = query4[0].email;
+
+        //send email to customer
+
+        var transporter = nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          secure: true,
+          auth: {
+            user: "orionteam5.tech@gmail.com",
+            pass: "lxmagyvbypwiivbd",
+          },
+        });
+
+        var mailOptions = {
+          from: "orionteam5.tech@gmail.com",
+          to: customerEmail,
+          subject: "Return Request Accepted",
+          text:
+            "Your return request has been accepted and your money has been refunded.Amount refunded = " +
+            amountToBeAddedToCustomer +
+            "." +
+            "/nThank you for shopping with us.",
+        };
+
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
       }
 
       //update returns table

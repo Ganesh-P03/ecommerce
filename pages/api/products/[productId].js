@@ -27,8 +27,8 @@ export default async function handler(req, res) {
     //http://localhost:3000/api/products/{sId}
     if (req.method === "POST") {
       const connection = await pool.getConnection();
-      console.log(req.query);
-      console.log(req);
+      //console.log(req.query);
+      //console.log(req);
       const { pName, pDesc, pImg, pCost, pQty } = req.body;
       console.log(pName, pDesc, pImg, pCost, pQty);
       const sId = req.query.productId;

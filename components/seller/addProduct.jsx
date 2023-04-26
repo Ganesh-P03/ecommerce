@@ -82,17 +82,12 @@ const AddProduct = (props) => {
     );
 
     try {
-      let pQty = 0;
-      items.forEach((item) => {
-        pQty += parseInt(item.itemQuantity);
-      });
-
       await axios.post(`/api/products/${props.id}`, {
         pName: productName,
         pDesc: productDescription,
         pImg: productImage,
         pCost: productPrice,
-        pQty: pQty,
+        pQty: itemQuantity,
       });
 
       //refresh the page

@@ -34,10 +34,16 @@ import AddItems from "./addItems";
 import Returns from "./returns";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-// import { mainListItems } from "./listItems";
-// import Chart from "./Chart";
-// import Deposits from "./Deposits";
-// import Orders from "./Orders";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
+import Chart from "./chart";
+import Orders from "./orders";
 
 const drawerWidth = 240;
 
@@ -95,6 +101,7 @@ function DashboardContent(props) {
 
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [Balance, setBalance] = useState(0);
+  const [sales, setSales] = useState([]);
 
   const mainListItems = (
     <React.Fragment>
@@ -143,6 +150,7 @@ function DashboardContent(props) {
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           <Grid container spacing={3}>
             {/* Chart */}
+
             <Grid item xs={12} md={8} lg={9}>
               <Paper
                 sx={{
@@ -152,11 +160,31 @@ function DashboardContent(props) {
                   height: 240,
                 }}
               >
-                {/* <Chart /> */}
+                <React.Fragment>
+                  <Title>Sales</Title>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Quantity Sold</TableCell>
+                        <TableCell align="right">Sale Amount</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {sales.map((row) => (
+                        <TableRow key={row.pId}>
+                          <TableCell>{row.pName}</TableCell>
+                          <TableCell>{row.totalQuantity}</TableCell>
+
+                          <TableCell align="right">{row.revenue}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </React.Fragment>
               </Paper>
             </Grid>
 
-            {/* Recent Deposits */}
             <Grid item xs={12} md={4} lg={3}>
               <Paper
                 sx={{
@@ -166,8 +194,6 @@ function DashboardContent(props) {
                   height: 240,
                 }}
               >
-                {/* <Deposits /> */}
-
                 <React.Fragment>
                   <Title>Balance</Title>
                   <Typography component="p" variant="h4">
@@ -184,31 +210,48 @@ function DashboardContent(props) {
                 </React.Fragment>
               </Paper>
             </Grid>
-            {/* Recent Orders */}
+
             <Grid item xs={12}>
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                {/* <Orders /> */}
+                <React.Fragment>
+                  <Title>Analysis</Title>
+
+                  {sales.length === 0 ? (
+                    <Typography component="p" variant="h4">
+                      No Sales
+                    </Typography>
+                  ) : (
+                    <Chart sales={sales} />
+                  )}
+                </React.Fragment>
               </Paper>
             </Grid>
           </Grid>
         </Container>
       );
     } else if (selectedIndex === 1) {
-      return <h1>Orders</h1>;
+      return <Orders id={props.id} />;
     } else if (selectedIndex === 2) {
       return <Products id={props.id} />;
     } else if (selectedIndex === 3) {
       return <AddProduct id={props.id} />;
     } else if (selectedIndex === 4) {
-      return <AddItems id={props.id} />;
+      return <h1>comming soon</h1>;
     } else if (selectedIndex === 5) {
       return <Returns id={props.id} />;
     }
   };
 
   const getBalance = useCallback(async () => {
-    const response = await axios.get(`/api/bank/account/?id=${props.id}`);
-    setBalance(response.data.balance);
+    try {
+      const response = await axios.get(`/api/bank/account/?id=${props.id}`);
+      setBalance(response.data.balance);
+
+      const response2 = await axios.get(`/api/sales/?sId=${props.id}`);
+      setSales(response2.data);
+    } catch (err) {
+      console.log(err);
+    }
   }, [props.id]);
 
   useEffect(() => {

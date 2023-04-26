@@ -1,76 +1,19 @@
-// import { useRouter } from "next/router";
+const Track = () => {
+  return (
+    <div>
+      <h1>Track</h1>
 
-// import * as React from "react";
-// import Timeline from "@mui/lab/Timeline";
-// import TimelineItem from "@mui/lab/TimelineItem";
-// import TimelineSeparator from "@mui/lab/TimelineSeparator";
-// import TimelineConnector from "@mui/lab/TimelineConnector";
-// import TimelineContent from "@mui/lab/TimelineContent";
-// import TimelineDot from "@mui/lab/TimelineDot";
+      <h2>shipped your order at 12:00 pm</h2>
 
-// const Track = () => {
-//   const router = useRouter();
+      <h3>reached wid 3 </h3>
 
-//   //   const [order, setOrder] = useState({});
+      <h3>reached wid 2 </h3>
 
-//   //   const getOrder = useCallback(async () => {
-//   //     try {
-//   //       const response = await axios.get(`/api/orders/?id=${router.query.id}`);
-//   //       console.log(response.data);
-//   //     } catch (err) {
-//   //       console.log(err);
-//   //     }
-//   //   }, [router.query.id]);
+      <h3>reached wid 1 </h3>
 
-//   //   useEffect(() => {
-//   //     getOrder(router.query.id);
-//   //   }, [getOrder, router.query.id]);
+      <h3>delivered home </h3>
+    </div>
+  );
+};
 
-//   {
-//     /*
-//         Make a timeline of the order
-//         1. Order placed
-//         2. Order confirmed
-//         3. Order shipped
-//         4. Order delivered
-
-//         and mark order shipped
-
-//         use mui timeline
-//     */
-//   }
-
-//   return (
-//     <Timeline position="alternate">
-//       <TimelineItem>
-//         <TimelineSeparator>
-//           <TimelineDot />
-//           <TimelineConnector />
-//         </TimelineSeparator>
-//         <TimelineContent>Eat</TimelineContent>
-//       </TimelineItem>
-//       <TimelineItem>
-//         <TimelineSeparator>
-//           <TimelineDot />
-//           <TimelineConnector />
-//         </TimelineSeparator>
-//         <TimelineContent>Code</TimelineContent>
-//       </TimelineItem>
-//       <TimelineItem>
-//         <TimelineSeparator>
-//           <TimelineDot />
-//           <TimelineConnector />
-//         </TimelineSeparator>
-//         <TimelineContent>Sleep</TimelineContent>
-//       </TimelineItem>
-//       <TimelineItem>
-//         <TimelineSeparator>
-//           <TimelineDot />
-//         </TimelineSeparator>
-//         <TimelineContent>Repeat</TimelineContent>
-//       </TimelineItem>
-//     </Timeline>
-//   );
-// };
-
-// export default Track;
+export default Track;

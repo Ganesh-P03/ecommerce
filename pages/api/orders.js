@@ -48,6 +48,7 @@ export default async function handler(req, res) {
 
         //check if offer is applicable for the product
         let offer = offers.find((offer) => offer.pId === item.pId);
+        let sellerAmount = 0;
 
         //if offer is applicable, then calculate the amount to be paid
         if (offer) {
@@ -58,6 +59,7 @@ export default async function handler(req, res) {
 
           //49900*2*10.0/100 = 9980
           amount = product[0].pCost * item.quantity - discount;
+          sellerAmount = product[0].pCost * item.quantity;
           //amount = 49900*2 - 9980 = 89820
 
           //seller will get 89820
@@ -76,17 +78,18 @@ export default async function handler(req, res) {
           }
         } else {
           amount = product[0].pCost * item.quantity;
+          sellerAmount = product[0].pCost * item.quantity;
           item["amount"] = amount;
           item["offerId"] = null;
         }
 
         //if sId is not present in the dictionary, then add it
         if (!amountToBePaid[item.accountNumber]) {
-          amountToBePaid[item.accountNumber] = amount;
+          amountToBePaid[item.accountNumber] = sellerAmount;
         }
         //else add the amount to the existing amount
         else {
-          amountToBePaid[item.accountNumber] += amount;
+          amountToBePaid[item.accountNumber] += sellerAmount;
         }
       }
 
@@ -148,34 +151,6 @@ export default async function handler(req, res) {
     try {
       const { cId } = req.query;
       const connection = await pool.getConnection();
-
-      /*
-        response = [
-              {
-              oId: 1,
-              cId: 1,
-              items: [
-                {
-                  pId: 1,
-                  name: "Product 1",
-                  price: 100,
-                  quantity: 1,
-                  image: "image1.jpg",
-                  desc: "Product 1 description",
-                },
-              ]
-            }
-          ]
-
-          get response of this form 
-          SELECT * FROM orders JOIN purchase_details ON orders.oId = purchase_details.oId JOIN products ON purchase_details.pId = products.pId WHERE orders.cId = 1;
-
-          //get response sorted by oId decreasing order
-
-          SELECT * FROM orders JOIN purchase_details ON orders.oId = purchase_details.oId JOIN products ON purchase_details.pId = products.pId WHERE orders.cId = 1 ORDER BY orders.oId DESC;
-        
-      */
-
       const response = [];
 
       const [orders] = await connection.query(

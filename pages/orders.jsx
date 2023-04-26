@@ -3,6 +3,7 @@ import CardComponent from "@/components/card";
 import { Button, Grid, Paper, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState, useCallback } from "react";
+import NextRouter from "next/router";
 
 import Layout from "@/components/layout";
 
@@ -91,6 +92,14 @@ const Orders = () => {
                           Return
                         </Button>
                       )}
+
+                      <Button
+                        onClick={() => {
+                          NextRouter.push("/track");
+                        }}
+                      >
+                        Track
+                      </Button>
                     </Grid>
                   </Grid>
                 </Paper>
