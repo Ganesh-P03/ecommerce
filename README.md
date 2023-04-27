@@ -1,3 +1,7 @@
+# Video link
+
+https://drive.google.com/drive/folders/172DUvhQCgufcJh7oU7_m0de1vNvlAuNL?usp=share_link
+
 # Features Implemented
 
 1. Three stakeHolders: `buyer`, `seller`, `advertiser`
@@ -27,3 +31,35 @@
 25. Seller can view the returns and approve or reject them
 26. if seller accepts the return, the amount is refunded to the buyer and mail is sent to the buyer.Amount is also deducted from the seller's balance.Discounted amount if any gets refunded to advertiser
 27. Buyer can track the order
+
+# Images
+
+## Login
+
+![Login](Images/signin.png)
+
+<br/>
+
+## Signup
+
+![Signup](Images/signup.png)
+
+## Buyer
+
+![Buyer](Images/Buyer.png)
+![Buyer](Images/cart.png)
+![Buyer](Images/review.png)
+![Buyer](Images/Payment.png)
+![Buyer](Images/orders.png)
+<br/>
+
+## Seller
+
+![Seller](Images/sellerDashboard.png)
+![Seller](Images/analysis.png)
+
+<br/>
+
+## Advertiser
+
+![Advertiser](Images/advertiser.png)
