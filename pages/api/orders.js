@@ -38,6 +38,8 @@ export default async function handler(req, res) {
       //deduct the discount from giverId maintain dictionary
       let discountToBeDeducted = {};
 
+      let platformAmount = 0;
+
       for (let item of cart) {
         let amount = 0;
 
@@ -60,6 +62,8 @@ export default async function handler(req, res) {
           //49900*2*10.0/100 = 9980
           amount = product[0].pCost * item.quantity - discount;
           sellerAmount = product[0].pCost * item.quantity;
+          platformAmount += sellerAmount * 0.05;
+          sellerAmount = sellerAmount * 0.95;
           //amount = 49900*2 - 9980 = 89820
 
           //seller will get 89820
@@ -79,6 +83,8 @@ export default async function handler(req, res) {
         } else {
           amount = product[0].pCost * item.quantity;
           sellerAmount = product[0].pCost * item.quantity;
+          platformAmount += sellerAmount * 0.05;
+          sellerAmount = sellerAmount * 0.95;
           item["amount"] = amount;
           item["offerId"] = null;
         }
@@ -116,6 +122,12 @@ export default async function handler(req, res) {
             { $inc: { balance: -discountToBeDeducted[accountNumber] } }
           );
         }
+
+        //update the balance of the platform
+        await Account.updateOne(
+          { accountNumber: "0000000000000000" },
+          { $inc: { balance: platformAmount } }
+        );
       }
 
       const con = await pool.getConnection();

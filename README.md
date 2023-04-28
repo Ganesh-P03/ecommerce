@@ -24,7 +24,7 @@ https://drive.google.com/drive/folders/172DUvhQCgufcJh7oU7_m0de1vNvlAuNL?usp=sha
 18. review cart,checkout through Dummy interface to pay for items
 19. payment through multiple cards
 20. Exception handling when amount balance is less than the amount to be paid (minimum balance of 1000)
-21. Platform enjoys commision on transactions
+21. Platform enjoys 5% commision on each transactions
 22. On succesful payment the sellers of the individual items in the order gets the amount credited to his/her account,also the inventory of the sellers is updated,customer cart is emptied
 23. Discounted amount withdrawn from the bank of the advertiser and credited to the seller
 24. order history
